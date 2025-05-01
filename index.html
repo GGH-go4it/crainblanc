@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu de Vocabulaire Néerlandais</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .question {
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        .options button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+        #resultat {
+            margin: 20px;
+            font-size: 20px;
+        }
+        #scoreFinal {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Apprends le Néerlandais : Parties du corps</h1>
+<div id="jeu">
+    <div id="nomJoueur"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="resultat"></div>
+</div>
+<div id="scoreFinal" style="display:none;"></div>
+
+<script>
+const vocabulaire = [
+    {fr: "tête", nl: "hoofd"},
+    {fr: "main", nl: "hand"},
+    {fr: "pied", nl: "voet"},
+    {fr: "jambe", nl: "been"},
+    {fr: "bras", nl: "arm"},
+    {fr: "oeil", nl: "oog"},
+    {fr: "nez", nl: "neus"},
+    {fr: "bouche", nl: "mond"},
+    {fr: "oreille", nl: "oor"},
+    {fr: "ventre", nl: "buik"},
+    {fr: "doigt", nl: "vinger"},
+    {fr: "genou", nl: "knie"},
+    {fr: "cheville", nl: "enkel"},
+    {fr: "coude", nl: "elleboog"},
+    {fr: "cou", nl: "nek"}
+];
+
+let questions = [];
+let index = 0;
+let score = 0;
+let joueur = prompt("Entrez votre nom :");
+
+function melanger(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function nouvelleQuestion() {
+    if (index >= 10) {
+        document.getElementById("jeu").style.display = "none";
+        document.getElementById("scoreFinal").style.display = "block";
+        document.getElementById("scoreFinal").innerText = `Bravo ${joueur} ! Ton score final est : ${score} points.`;
+        return;
+    }
+
+    document.getElementById("nomJoueur").innerText = `Joueur : ${joueur}`;
+
+    const current = questions[index];
+    document.getElementById("question").innerText = `Quel est le mot néerlandais pour : "${current.fr}" ?`;
+
+    let propositions = [current.nl];
+    while (propositions.length < 3) {
+        let random = vocabulaire[Math.floor(Math.random() * vocabulaire.length)].nl;
+        if (!propositions.includes(random)) {
+            propositions.push(random);
+        }
+    }
+
+    propositions = melanger(propositions);
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+    propositions.forEach(option => {
+        const btn = document.createElement("button");
+        btn.innerText = option;
+        btn.onclick = () => verifier(option, current.nl);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function verifier(choix, reponse) {
+    const resultatDiv = document.getElementById("resultat");
+    if (choix === reponse) {
+        score += 10;
+        resultatDiv.innerHTML = "🎉 Bravo ! Bonne réponse ! 🎉";
+    } else {
+        score -= 5;
+        resultatDiv.innerHTML = "😔 Mauvaise réponse, essaye encore ! 😔";
+    }
+    index++;
+    setTimeout(nouvelleQuestion, 1000);
+}
+
+function demarrerJeu() {
+    questions = melanger([...vocabulaire]).slice(0, 10);
+    nouvelleQuestion();
+}
+
+demarrerJeu();
+</script>
+
+</body>
+</html>
