@@ -25,20 +25,33 @@
         #scoreFinal {
             font-size: 24px;
             font-weight: bold;
+            margin-top: 20px;
+        }
+        #hallOfFame {
+            margin-top: 30px;
+            list-style-type: none;
+            padding: 0;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
 <h1>Apprends le Néerlandais : Parties du corps</h1>
+
 <div id="jeu">
     <div id="nomJoueur"></div>
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
     <div id="resultat"></div>
 </div>
+
 <div id="scoreFinal" style="display:none;"></div>
 
+<h2>🏆 Hall of Fame</h2>
+<ul id="hallOfFame"></ul>
+
+<!-- Script principal du jeu -->
 <script>
 const vocabulaire = [
     {fr: "tête", nl: "hoofd"},
@@ -76,6 +89,21 @@ function nouvelleQuestion() {
         document.getElementById("jeu").style.display = "none";
         document.getElementById("scoreFinal").style.display = "block";
         document.getElementById("scoreFinal").innerText = `Bravo ${joueur} ! Ton score final est : ${score} points.`;
+
+        // 🔹 Enregistrement dans Firebase
+        db.collection("scores").add({
+            nom: joueur,
+            score: score,
+            date: new Date()
+        })
+        .then(() => {
+            console.log("Score ajouté avec succès !");
+            afficherHallOfFame();
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'enregistrement du score :", error);
+        });
+
         return;
     }
 
@@ -117,12 +145,49 @@ function verifier(choix, reponse) {
     setTimeout(nouvelleQuestion, 1000);
 }
 
+function afficherHallOfFame() {
+    db.collection("scores")
+      .orderBy("score", "desc")
+      .limit(10)
+      .get()
+      .then((querySnapshot) => {
+          const ul = document.getElementById("hallOfFame");
+          ul.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              const li = document.createElement("li");
+              li.textContent = `${data.nom} : ${data.score} points`;
+              ul.appendChild(li);
+          });
+      });
+}
+
 function demarrerJeu() {
     questions = melanger([...vocabulaire]).slice(0, 10);
     nouvelleQuestion();
 }
 
 demarrerJeu();
+</script>
+
+<!-- Firebase App (core SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+<!-- Firebase Firestore -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+
+<script>
+  // Configuration Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCByqXyY5qLjAIS0lEDzOBkVk05OV3ZdR8",
+    authDomain: "jeu-vocabulaire-ndls.firebaseapp.com",
+    projectId: "jeu-vocabulaire-ndls",
+    storageBucket: "jeu-vocabulaire-ndls.appspot.com",
+    messagingSenderId: "224131224059",
+    appId: "1:224131224059:web:11ccbe706c044354a4fb5e"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 </script>
 
 </body>
