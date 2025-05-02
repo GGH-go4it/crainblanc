@@ -39,7 +39,6 @@
 
 <h1>Apprends le Néerlandais en t'amusant: Parties du corps</h1>
 
-<!-- Zone de jeu -->
 <div id="jeu">
     <div id="nomJoueur"></div>
     <div class="question" id="question"></div>
@@ -47,23 +46,19 @@
     <div id="resultat"></div>
 </div>
 
-<!-- Score final -->
 <div id="scoreFinal" style="display:none;"></div>
 
-<!-- 🆕 Boutons Rejouer & Classement -->
 <div id="actionsFinales" style="display:none; margin-top: 20px;">
     <button onclick="rejouer()">🔁 Rejouer</button>
     <button onclick="afficherHallOfFame()">🏆 Voir le classement</button>
 </div>
 
-<!-- Hall of Fame -->
 <h2>🏆 Hall of Fame</h2>
 <ul id="hallOfFame"></ul>
 
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 
-<!-- Script principal -->
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyCByqXyY5qLjAIS0lEDzOBkVk05OV3ZdR8",
@@ -72,11 +67,10 @@ const firebaseConfig = {
     storageBucket: "jeu-vocabulaire-ndls.appspot.com",
     messagingSenderId: "224131224059",
     appId: "1:224131224059:web:11ccbe706c044354a4fb5e"
-  };
+};
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
 
 const vocabulaire = [
     {fr: "tête", nl: "hoofd"},
@@ -114,9 +108,8 @@ function nouvelleQuestion() {
         document.getElementById("jeu").style.display = "none";
         document.getElementById("scoreFinal").style.display = "block";
         document.getElementById("scoreFinal").innerText = `Bravo ${joueur} ! Ton score final est : ${score} points.`;
-        document.getElementById("actionsFinales").style.display = "block"; // 👈 Affiche les boutons
+        document.getElementById("actionsFinales").style.display = "block";
 
-        // Enregistrement dans Firebase
         db.collection("scores").add({
             nom: joueur,
             score: score,
