@@ -37,7 +37,7 @@
 </head>
 <body>
 
-<h1>Apprends le Néerlandais : Parties du corps</h1>
+<h1>Apprends le Néerlandais en t'amusant: Parties du corps</h1>
 
 <!-- Zone de jeu -->
 <div id="jeu">
@@ -60,8 +60,24 @@
 <h2>🏆 Hall of Fame</h2>
 <ul id="hallOfFame"></ul>
 
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
 <!-- Script principal -->
 <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCByqXyY5qLjAIS0lEDzOBkVk05OV3ZdR8",
+    authDomain: "jeu-vocabulaire-ndls.firebaseapp.com",
+    projectId: "jeu-vocabulaire-ndls",
+    storageBucket: "jeu-vocabulaire-ndls.appspot.com",
+    messagingSenderId: "224131224059",
+    appId: "1:224131224059:web:11ccbe706c044354a4fb5e"
+  };
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
 const vocabulaire = [
     {fr: "tête", nl: "hoofd"},
     {fr: "main", nl: "hand"},
@@ -210,3 +226,4 @@ demarrerJeu();
 
 </body>
 </html>
+
