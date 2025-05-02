@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – Ajouter du vocabulaire</title>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+</head>
+<body>
+    <h1>💬 Ajout de vocabulaire</h1>
+
+    <form id="formVocab">
+        <label>Français :</label><br>
+        <input type="text" id="fr" required><br><br>
+
+        <label>Traduction :</label><br>
+        <input type="text" id="trad" required><br><br>
+
+        <label>Langue cible :</label><br>
+        <select id="langue" required>
+            <option value="nl">Néerlandais</option>
+            <option value="en">Anglais</option>
+            <option value="de">Allemand</option>
+        </select><br><br>
+
+        <label>Niveau :</label><br>
+        <select id="niveau" required>
+            <option value="1">Facile (1)</option>
+            <option value="2">Moyen (2)</option>
+            <option value="3">Difficile (3)</option>
+        </select><br><br>
+
+        <label>Thèmes (séparés par des virgules) :</label><br>
+        <input type="text" id="themes" placeholder="ex : corps, école" required><br><br>
+
+        <button type="submit">✅ Ajouter le mot</button>
+    </form>
+
+    <div id="message" style="margin-top: 20px;"></div>
+
+    <script>
+        const form = document.getElementById("formVocab");
+        const message = document.getElementById("message");
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const fr = document.getElementById("fr").value.trim();
+            const trad = document.getElementById("trad").value.trim();
+            const langue = document.getElementById("langue").value.trim();
+            const niveau = parseInt(document.getElementById("niveau").value.trim());
+            const themes = document.getElementById("themes").value.trim()
+                              .split(',').map(t => t.trim().toLowerCase()).filter(t => t);
+
+            if (!fr || !trad || !langue || !niveau || themes.length === 0) {
+                message.innerText = "❌ Veuillez remplir tous les champs.";
+                return;
+            }
+
+            db.collection("vocabulaire").add({
+                fr,
+                trad,
+                langue,
+                niveau,
+                themes
+            }).then(() => {
+                message.innerText = "✅ Mot ajouté avec succès !";
+                form.reset();
+            }).catch((error) => {
+                message.innerText = "❌ Erreur : " + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
