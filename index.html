@@ -39,6 +39,7 @@
 
 <h1>Apprends le Néerlandais : Parties du corps</h1>
 
+<!-- Zone de jeu -->
 <div id="jeu">
     <div id="nomJoueur"></div>
     <div class="question" id="question"></div>
@@ -46,12 +47,20 @@
     <div id="resultat"></div>
 </div>
 
+<!-- Score final -->
 <div id="scoreFinal" style="display:none;"></div>
 
+<!-- 🆕 Boutons Rejouer & Classement -->
+<div id="actionsFinales" style="display:none; margin-top: 20px;">
+    <button onclick="rejouer()">🔁 Rejouer</button>
+    <button onclick="afficherHallOfFame()">🏆 Voir le classement</button>
+</div>
+
+<!-- Hall of Fame -->
 <h2>🏆 Hall of Fame</h2>
 <ul id="hallOfFame"></ul>
 
-<!-- Script principal du jeu -->
+<!-- Script principal -->
 <script>
 const vocabulaire = [
     {fr: "tête", nl: "hoofd"},
@@ -89,8 +98,9 @@ function nouvelleQuestion() {
         document.getElementById("jeu").style.display = "none";
         document.getElementById("scoreFinal").style.display = "block";
         document.getElementById("scoreFinal").innerText = `Bravo ${joueur} ! Ton score final est : ${score} points.`;
+        document.getElementById("actionsFinales").style.display = "block"; // 👈 Affiche les boutons
 
-        // 🔹 Enregistrement dans Firebase
+        // Enregistrement dans Firebase
         db.collection("scores").add({
             nom: joueur,
             score: score,
@@ -162,6 +172,17 @@ function afficherHallOfFame() {
       });
 }
 
+function rejouer() {
+    index = 0;
+    score = 0;
+    questions = melanger([...vocabulaire]).slice(0, 10);
+    document.getElementById("jeu").style.display = "block";
+    document.getElementById("scoreFinal").style.display = "none";
+    document.getElementById("actionsFinales").style.display = "none";
+    document.getElementById("resultat").innerHTML = "";
+    demarrerJeu();
+}
+
 function demarrerJeu() {
     questions = melanger([...vocabulaire]).slice(0, 10);
     nouvelleQuestion();
@@ -170,13 +191,10 @@ function demarrerJeu() {
 demarrerJeu();
 </script>
 
-<!-- Firebase App (core SDK) -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-<!-- Firebase Firestore -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-
 <script>
-  // Configuration Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCByqXyY5qLjAIS0lEDzOBkVk05OV3ZdR8",
     authDomain: "jeu-vocabulaire-ndls.firebaseapp.com",
