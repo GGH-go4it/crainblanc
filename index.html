@@ -1,54 +1,48 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Jeu de Vocabulaire Néerlandais</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        .question {
-            margin: 20px 0;
-            font-size: 24px;
-        }
-        .options button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 18px;
-        }
-        #resultat {
-            margin: 20px;
-            font-size: 20px;
-        }
-        #scoreFinal {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        #hallOfFame {
-            margin-top: 30px;
-            list-style-type: none;
-            padding: 0;
-            font-size: 18px;
-        }
-    </style>
+    <title>Jeu de Vocabulaire</title>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/vocabulaire.js"></script>
+    <script src="js/game-logic.js"></script>
 </head>
 <body>
+    <h1>Apprends le vocabulaire en t'amusant</h1>
 
-<h1>Apprends le Néerlandais en t'amusant: Parties du corps</h1>
+```
+<div id="menu-demarrage">
+    <label for="nom">Ton prénom :</label>
+    <input type="text" id="nom" required><br><br>
 
-<div id="jeu">
+    <label for="langue">Choisis une langue :</label>
+    <select id="langue">
+        <option value="nl">Néerlandais</option>
+        <option value="en">Anglais</option>
+    </select><br><br>
+
+    <label for="niveau">Choisis un niveau :</label>
+    <select id="niveau">
+        <option value="1">Facile</option>
+        <option value="2">Moyen</option>
+        <option value="3">Difficile</option>
+    </select><br><br>
+
+    <button onclick="lancerJeu()">Commencer le jeu</button>
+</div>
+
+<div id="jeu" style="display:none">
     <div id="nomJoueur"></div>
-    <div class="question" id="question"></div>
-    <div class="options" id="options"></div>
+    <div id="question"></div>
+    <div id="options"></div>
     <div id="resultat"></div>
 </div>
 
 <div id="scoreFinal" style="display:none;"></div>
-
-<div id="actionsFinales" style="display:none; margin-top: 20px;">
+<div id="actionsFinales" style="display:none;">
     <button onclick="rejouer()">🔁 Rejouer</button>
     <button onclick="afficherHallOfFame()">🏆 Voir le classement</button>
 </div>
@@ -56,150 +50,26 @@
 <h2>🏆 Hall of Fame</h2>
 <ul id="hallOfFame"></ul>
 
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-    apiKey: "AIzaSyCByqXyY5qLjAIS0lEDzOBkVk05OV3ZdR8",
-    authDomain: "jeu-vocabulaire-ndls.firebaseapp.com",
-    projectId: "jeu-vocabulaire-ndls",
-    storageBucket: "jeu-vocabulaire-ndls.appspot.com",
-    messagingSenderId: "224131224059",
-    appId: "1:224131224059:web:11ccbe706c044354a4fb5e"
-};
+    function lancerJeu() {
+        const nom = document.getElementById("nom").value.trim();
+        const langue = document.getElementById("langue").value;
+        const niveau = parseInt(document.getElementById("niveau").value);
 
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-const vocabulaire = [
-    {fr: "tête", nl: "hoofd"},
-    {fr: "main", nl: "hand"},
-    {fr: "pied", nl: "voet"},
-    {fr: "jambe", nl: "been"},
-    {fr: "bras", nl: "arm"},
-    {fr: "oeil", nl: "oog"},
-    {fr: "nez", nl: "neus"},
-    {fr: "bouche", nl: "mond"},
-    {fr: "oreille", nl: "oor"},
-    {fr: "ventre", nl: "buik"},
-    {fr: "doigt", nl: "vinger"},
-    {fr: "genou", nl: "knie"},
-    {fr: "cheville", nl: "enkel"},
-    {fr: "coude", nl: "elleboog"},
-    {fr: "cou", nl: "nek"}
-];
-
-let questions = [];
-let index = 0;
-let score = 0;
-let joueur = prompt("Entrez votre nom :");
-
-function melanger(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-function nouvelleQuestion() {
-    if (index >= 10) {
-        document.getElementById("jeu").style.display = "none";
-        document.getElementById("scoreFinal").style.display = "block";
-        document.getElementById("scoreFinal").innerText = `Bravo ${joueur} ! Ton score final est : ${score} points.`;
-        document.getElementById("actionsFinales").style.display = "block";
-
-        db.collection("scores").add({
-            nom: joueur,
-            score: score,
-            date: new Date()
-        })
-        .then(() => {
-            console.log("Score ajouté avec succès !");
-            afficherHallOfFame();
-        })
-        .catch((error) => {
-            console.error("Erreur lors de l'enregistrement du score :", error);
-        });
-
-        return;
-    }
-
-    document.getElementById("nomJoueur").innerText = `Joueur : ${joueur}`;
-
-    const current = questions[index];
-    document.getElementById("question").innerText = `Quel est le mot néerlandais pour : "${current.fr}" ?`;
-
-    let propositions = [current.nl];
-    while (propositions.length < 3) {
-        let random = vocabulaire[Math.floor(Math.random() * vocabulaire.length)].nl;
-        if (!propositions.includes(random)) {
-            propositions.push(random);
+        if (!nom) {
+            alert("Merci d'indiquer ton prénom avant de commencer !");
+            return;
         }
+
+        joueur = nom;
+		langueActuelle = langue;
+		niveauActuel = niveau;
+        document.getElementById("menu-demarrage").style.display = "none";
+        document.getElementById("jeu").style.display = "block";
+        chargerVocabulaire(niveau, langue); // cette fonction est dans vocabulaire.js
     }
-
-    propositions = melanger(propositions);
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-    propositions.forEach(option => {
-        const btn = document.createElement("button");
-        btn.innerText = option;
-        btn.onclick = () => verifier(option, current.nl);
-        optionsDiv.appendChild(btn);
-    });
-}
-
-function verifier(choix, reponse) {
-    const resultatDiv = document.getElementById("resultat");
-    if (choix === reponse) {
-        score += 10;
-        resultatDiv.innerHTML = "🎉 Bravo ! Bonne réponse ! 🎉";
-    } else {
-        score -= 5;
-        resultatDiv.innerHTML = "😔 Mauvaise réponse, essaye encore ! 😔";
-    }
-    index++;
-    setTimeout(nouvelleQuestion, 1000);
-}
-
-function afficherHallOfFame() {
-    db.collection("scores")
-      .orderBy("score", "desc")
-      .limit(10)
-      .get()
-      .then((querySnapshot) => {
-          const ul = document.getElementById("hallOfFame");
-          ul.innerHTML = "";
-          querySnapshot.forEach((doc) => {
-              const data = doc.data();
-              const li = document.createElement("li");
-              li.textContent = `${data.nom} : ${data.score} points`;
-              ul.appendChild(li);
-          });
-      });
-}
-
-function rejouer() {
-    index = 0;
-    score = 0;
-    questions = melanger([...vocabulaire]).slice(0, 10);
-    document.getElementById("jeu").style.display = "block";
-    document.getElementById("scoreFinal").style.display = "none";
-    document.getElementById("actionsFinales").style.display = "none";
-    document.getElementById("resultat").innerHTML = "";
-    demarrerJeu();
-}
-
-function demarrerJeu() {
-    questions = melanger([...vocabulaire]).slice(0, 10);
-    nouvelleQuestion();
-}
-
-demarrerJeu();
 </script>
+```
 
 </body>
 </html>
-
