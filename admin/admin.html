@@ -6,6 +6,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
+	<script src="../js/admin_lister_vocabulaire.js"></script>
 </head>
 <body>
     <h1>💬 Ajout de vocabulaire</h1>
@@ -38,6 +39,9 @@
     </form>
 
     <div id="message" style="margin-top: 20px;"></div>
+	<h2>📋 Mots enregistrés</h2>
+	<ul id="listeVocabulaire"></ul>
+	<button onclick="afficherTousLesMots()">🔄 Rafraîchir la liste</button>
 
     <script>
         const form = document.getElementById("formVocab");
