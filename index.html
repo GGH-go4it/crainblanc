@@ -9,6 +9,10 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/vocabulaire.js"></script>
     <script src="js/game-logic.js"></script>
+	<script> window.addEventListener("DOMContentLoaded", () => {
+    chargerThemesDisponibles();
+});
+</script>
 </head>
 <body>
     <h1>Apprends le vocabulaire en t'amusant</h1>
@@ -30,6 +34,12 @@
         <option value="2">Moyen</option>
         <option value="3">Difficile</option>
     </select><br><br>
+	<label for="theme">Choisis un thème :</label>
+<select id="theme">
+    <option disabled selected>Chargement...</option>
+</select>
+<br><br>
+
 
     <button onclick="lancerJeu()">Commencer le jeu</button>
 </div>
@@ -55,6 +65,7 @@
         const nom = document.getElementById("nom").value.trim();
         const langue = document.getElementById("langue").value;
         const niveau = parseInt(document.getElementById("niveau").value);
+		const theme = document.getElementById("theme").value;
 
         if (!nom) {
             alert("Merci d'indiquer ton prénom avant de commencer !");
@@ -64,6 +75,7 @@
         joueur = nom;
 		langueActuelle = langue;
 		niveauActuel = niveau;
+		themeActuel = theme;
         document.getElementById("menu-demarrage").style.display = "none";
         document.getElementById("jeu").style.display = "block";
         chargerVocabulaire(niveau, langue); // cette fonction est dans vocabulaire.js

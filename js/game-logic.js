@@ -6,6 +6,8 @@ let score = 0;
 let joueur = ""; // défini depuis le formulaire
 let langueActuelle = "nl"; // par défaut
 let niveauActuel = 1;
+let themeActuel = "corps"; // valeur par défaut
+
 
 function melanger(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -42,7 +44,7 @@ function nouvelleQuestion() {
         return;
     }
 
-    document.getElementById("nomJoueur").innerText = `Joueur : ${joueur}`;
+    document.getElementById("nomJoueur").innerText = `Joueur : ${joueur} — Thème : ${themeActuel}`;
 
     const current = questions[index];
     document.getElementById("question").innerText = `Quel est le mot en ${current.langue.toUpperCase()} pour : "${current.fr}" ?`;
